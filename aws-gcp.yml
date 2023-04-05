@@ -14,7 +14,7 @@ phases:
       - echo "enabled=1" | tee -a /etc/yum.repos.d/google-cloud-sdk.repo
       - echo "gpgcheck=1" | tee -a /etc/yum.repos.d/google-cloud-sdk.repo
       - yum install -y google-cloud-sdk
-      - gcloud auth activate-service-account --key-file=blox-tech-03aba9a09087.json
+      - gcloud auth activate-service-account --key-file=< name your file>
       - gcloud auth configure-docker
   build:
     commands:
@@ -28,6 +28,4 @@ phases:
       - echo Pushing the Docker image...
       - docker push gcr.io/blox-tech/test:latest 
       - echo Writing image definitions file...
-      - printf '[{"name":"test","imageUri":"075675496809.dkr.ecr.ap-south-1.amazonaws.com/test:latest"}]' > imagedefinitions.json
-artifacts:
-  files: imagedefinitions.json
+      
