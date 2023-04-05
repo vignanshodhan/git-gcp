@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+      IMAGE_NAME: git-gcp
+      PROJECT_ID: zippy-parity-382718 # change need 
+phases:
+  pre_build:
+    commands:
+      - yum update -y
+      - rpm --import https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      - echo "[google-cloud-sdk]" | tee /etc/yum.repos.d/google-cloud-sdk.repo
+      - echo "name=Google Cloud SDK" | tee -a /etc/yum.repos.d/google-cloud-sdk.repo
+      - echo "baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64" | tee -a /etc/yum.repos.d/google-cloud-sdk.repo
+      - echo "enabled=1" | tee -a /etc/yum.repos.d/google-cloud-sdk.repo
+      - echo "gpgcheck=1" | tee -a /etc/yum.repos.d/google-cloud-sdk.repo
+      - yum install -y google-cloud-sdk
+      - gcloud auth activate-service-account --key-file=blox-tech-03aba9a09087.json
+      - gcloud auth configure-docker
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t test .
+      - docker tag test gcr.io/blox-tech/test   
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push gcr.io/blox-tech/test:latest 
+      - echo Writing image definitions file...
+      - printf '[{"name":"test","imageUri":"075675496809.dkr.ecr.ap-south-1.amazonaws.com/test:latest"}]' > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
